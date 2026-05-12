@@ -1,0 +1,21 @@
+# Core RAG pipeline
+ollama>=0.3.3
+faiss-cpu>=1.7.4
+numpy>=1.24.0
+
+# Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+langdetect>=1.0.9
+
+# API
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.0.0
+
+# Reranker (cross-encoder)
+sentence-transformers>=2.6.0
+
+# Utilities
+loguru>=0.7.0

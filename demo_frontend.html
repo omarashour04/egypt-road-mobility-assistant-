@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Egyptian Road & Mobility Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=Noto+Kufi+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0a0f1a;
+    --bg2:       #111827;
+    --bg3:       #1a2235;
+    --surface:   #1e2d42;
+    --surface2:  #243348;
+    --border:    rgba(255,255,255,0.08);
+    --border2:   rgba(255,255,255,0.14);
+    --gold:      #c9973a;
+    --gold-lt:   #e8b95a;
+    --gold-pale: rgba(201,151,58,0.12);
+    --gold-glow: rgba(201,151,58,0.25);
+    --text:      #e8e4da;
+    --text2:     #a09880;
+    --text3:     #6b6050;
+    --green:     #2ecc8a;
+    --green-pale:#0f3d27;
+    --red:       #e05252;
+    --red-pale:  #3d1515;
+    --blue:      #5899e8;
+    --blue-pale: rgba(88,153,232,0.12);
+    --radius:    12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --ff-heading:'Playfair Display', Georgia, serif;
+    --ff-body:   'DM Sans', sans-serif;
+    --ff-arabic: 'Noto Kufi Arabic', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ff-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background texture ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,151,58,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 90% 80%, rgba(88,153,232,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .page { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Header ── */
+  header {
+    padding: 48px 0 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-pale);
+    border: 1px solid rgba(201,151,58,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold-lt);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .logo-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  h1 {
+    font-family: var(--ff-heading);
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  h1 span { color: var(--gold); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text2);
+    max-width: 480px;
+    margin: 0 auto 24px;
+  }
+
+  .subtitle-ar {
+    font-family: var(--ff-arabic);
+    font-size: 14px;
+    color: var(--text3);
+    direction: rtl;
+    margin-top: 4px;
+  }
+
+  /* ── Stats row ── */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--gold);
+    font-family: var(--ff-heading);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .stat-div {
+    width: 1px;
+    height: 32px;
+    background: var(--border2);
+    align-self: center;
+  }
+
+  /* ── Topic pills ── */
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .topic-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .topic-pill:hover,
+  .topic-pill.active {
+    background: var(--gold-pale);
+    border-color: rgba(201,151,58,0.4);
+    color: var(--gold-lt);
+  }
+
+  /* ── Main card ── */
+  .main-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .card-header-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-red   { background: #e05252; }
+  .dot-amber { background: #e0a252; }
+  .dot-green { background: #52e09b; }
+
+  .card-header-title {
+    font-size: 13px;
+    color: var(--text3);
+    margin-left: 4px;
+    font-weight: 300;
+  }
+
+  /* ── Input area ── */
+  .input-area {
+    padding: 24px;
+  }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--ff-body);
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 16px 50px 16px 18px;
+    resize: none;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  textarea:focus {
+    border-color: rgba(201,151,58,0.5);
+    background: var(--surface2);
+  }
+
+  textarea::placeholder { color: var(--text3); }
+
+  /* Arabic RTL support */
+  textarea.is-arabic {
+    direction: rtl;
+    font-family: var(--ff-arabic);
+    font-size: 16px;
+  }
+
+  .ask-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .ask-btn:hover { background: var(--gold-lt); }
+  .ask-btn:active { transform: scale(0.95); }
+  .ask-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .ask-btn svg { width: 18px; height: 18px; fill: var(--bg); }
+
+  /* ── Options row ── */
+  .options-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 0 24px 20px;
+  }
+
+  .toggle-label {
+    font-size: 13px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle-label input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
+
+  .session-tag {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text3);
+    background: var(--bg3);
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── Example questions ── */
+  .examples {
+    padding: 0 24px 20px;
+  }
+
+  .examples-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .example-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .example-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .example-chip.ar { font-family: var(--ff-arabic); direction: rtl; }
+
+  .example-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold-lt);
+    background: var(--gold-pale);
+  }
+
+  /* ── Answer area ── */
+  .answer-area {
+    border-top: 1px solid var(--border);
+    min-height: 0;
+    overflow: hidden;
+    transition: min-height 0.3s ease;
+  }
+
+  .answer-area.has-content { min-height: 120px; }
+
+  /* Loading */
+  .loading-state {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 24px;
+  }
+
+  .loading-state.visible { display: flex; }
+
+  .loader-orbs {
+    display: flex;
+    gap: 5px;
+  }
+
+  .orb {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: bounce 1.2s ease infinite;
+  }
+
+  .orb:nth-child(2) { animation-delay: 0.15s; }
+  .orb:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+
+  .loading-text { font-size: 13px; color: var(--text2); }
+
+  /* Answer content */
+  .answer-content {
+    display: none;
+    padding: 24px;
+  }
+
+  .answer-content.visible { display: block; }
+
+  .answer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .answer-badge::before {
+    content: '';
+    width: 16px; height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .answer-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .answer-text.is-arabic {
+    font-family: var(--ff-arabic);
+    direction: rtl;
+    font-size: 16px;
+    text-align: right;
+  }
+
+  /* ── Metadata bar ── */
+  .meta-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--bg3);
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .meta-item strong { color: var(--text2); }
+
+  .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text3); }
+
+  /* ── Sources ── */
+  .sources-section {
+    margin-top: 4px;
+  }
+
+  .sources-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    color: var(--text3);
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    user-select: none;
+    transition: color 0.2s;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .sources-toggle:hover { color: var(--text2); }
+
+  .sources-toggle .chevron {
+    margin-left: auto;
+    transition: transform 0.2s;
+  }
+
+  .sources-toggle.open .chevron { transform: rotate(180deg); }
+
+  .sources-grid {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    padding: 0 24px 20px;
+  }
+
+  .sources-grid.open { display: grid; }
+
+  .source-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .source-card:hover { border-color: var(--border2); }
+
+  .source-url {
+    font-size: 11px;
+    color: var(--blue);
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+
+  .source-url:hover { color: var(--text); text-decoration: underline; }
+
+  .source-group {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .source-preview {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .source-score {
+    font-size: 10.5px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* ── Error ── */
+  .error-box {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    color: var(--red);
+    font-size: 13.5px;
+    border-top: 1px solid rgba(224,82,82,0.2);
+    background: rgba(61,21,21,0.3);
+  }
+
+  .error-box.visible { display: flex; }
+
+  /* ── Feature cards ── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .feat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .feat:hover {
+    border-color: var(--border2);
+    background: var(--bg3);
+  }
+
+  .feat-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .feat-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .feat-desc {
+    font-size: 12.5px;
+    color: var(--text3);
+    line-height: 1.55;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 28px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  footer a { color: var(--text2); text-decoration: none; }
+  footer a:hover { color: var(--gold); }
+
+  /* ── Health dot ── */
+  .health-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .health-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text3);
+  }
+
+  .health-dot.healthy { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .health-dot.unhealthy { background: var(--red); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .stats { gap: 16px; }
+    .stat-div { display: none; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="logo-badge">
+      <span class="logo-dot"></span>
+      RAG-Powered · Live Demo
+    </div>
+
+    <h1>Egyptian Road &<br><span>Mobility Assistant</span></h1>
+
+    <p class="subtitle">
+      Ask any question about Egyptian traffic laws, driving licenses,
+      fines, and road rules — in Arabic or English.
+    </p>
+    <p class="subtitle-ar">اسأل عن قوانين المرور المصرية، رخص القيادة، الغرامات والقواعد</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num" id="stat-chunks">473</div>
+        <div class="stat-label">Knowledge chunks</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Legal domains</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Languages</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num" id="stat-health">
+          <span class="health-indicator">
+            <span class="health-dot" id="health-dot"></span>
+            <span id="health-label">Checking…</span>
+          </span>
+        </div>
+        <div class="stat-label">API status</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Feature chips ── -->
+  <div class="topics" id="domain-topics">
+    <button class="topic-pill active" data-domain="all">All domains</button>
+    <button class="topic-pill" data-domain="traffic_law">Traffic Law</button>
+    <button class="topic-pill" data-domain="driving_license">Driving License</button>
+    <button class="topic-pill" data-domain="vehicle_registration">Vehicle Registration</button>
+    <button class="topic-pill" data-domain="accident_liability">Accident Liability</button>
+    <button class="topic-pill" data-domain="commercial_vehicles">Commercial Vehicles</button>
+    <button class="topic-pill" data-domain="international_driving">International Driving</button>
+  </div>
+
+  <!-- ── Main Q&A card ── -->
+  <div class="main-card">
+
+    <div class="card-header">
+      <span class="card-header-dot dot-red"></span>
+      <span class="card-header-dot dot-amber"></span>
+      <span class="card-header-dot dot-green"></span>
+      <span class="card-header-title">Egyptian Road & Mobility Assistant — localhost:8000</span>
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-label">Your question</div>
+      <div class="input-wrapper">
+        <textarea
+          id="question-input"
+          placeholder="e.g. What is the fine for using a mobile phone while driving? / ما هي غرامة استخدام الجوال أثناء القيادة؟"
+          rows="3"
+        ></textarea>
+        <button class="ask-btn" id="ask-btn" title="Ask" aria-label="Submit question">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="thinking-toggle"/>
+        Deep reasoning (thinking mode)
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="reranker-toggle" checked/>
+        Cross-encoder reranker
+      </label>
+      <span class="session-tag" id="session-tag">No session</span>
+    </div>
+
+    <!-- Example chips -->
+    <div class="examples">
+      <div class="examples-label">Try these examples</div>
+      <div class="example-chips" id="example-chips">
+        <button class="example-chip en" data-q="What is the speed limit in residential areas in Egypt?">Speed limit in residential areas</button>
+        <button class="example-chip en" data-q="What are the steps to renew a driving license in Egypt?">How to renew a driving license</button>
+        <button class="example-chip en" data-q="What are the fines for speeding in Egypt?">Speeding fines</button>
+        <button class="example-chip ar" data-q="ما هي غرامة استخدام الموبايل أثناء القيادة؟">ما هي غرامة استخدام الموبايل؟</button>
+        <button class="example-chip ar" data-q="ما هي أوراق تجديد رخصة القيادة في مصر؟">أوراق تجديد رخصة القيادة</button>
+        <button class="example-chip ar" data-q="كيف يتم تسجيل سيارة جديدة في مصر؟">تسجيل سيارة جديدة</button>
+        <button class="example-chip en" data-q="What documents are needed to register a vehicle in Egypt?">Vehicle registration documents</button>
+        <button class="example-chip en" data-q="Can I use an international driving permit in Egypt?">International driving permit</button>
+      </div>
+    </div>
+
+    <!-- Answer area -->
+    <div class="answer-area" id="answer-area">
+
+      <div class="loading-state" id="loading-state">
+        <div class="loader-orbs">
+          <div class="orb"></div>
+          <div class="orb"></div>
+          <div class="orb"></div>
+        </div>
+        <span class="loading-text" id="loading-text">Retrieving relevant legal text…</span>
+      </div>
+
+      <div class="error-box" id="error-box">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="error-text">Could not connect to API. Make sure the server is running on port 8000.</span>
+      </div>
+
+      <div class="answer-content" id="answer-content">
+        <div class="answer-badge">Answer</div>
+        <div class="answer-text" id="answer-text"></div>
+      </div>
+
+      <!-- Metadata bar -->
+      <div class="meta-bar" id="meta-bar" style="display:none">
+        <span class="meta-item"><strong id="meta-model">—</strong></span>
+        <span class="meta-dot"></span>
+        <span class="meta-item"><strong id="meta-chunks">—</strong> chunks</span>
+        <span class="meta-dot"></span>
+        <span class="meta-item" id="meta-hyde-wrap" style="display:none">HyDE ✓<span class="meta-dot" style="display:inline-block;margin-left:8px"></span></span>
+        <span class="meta-item" id="meta-reranker-wrap" style="display:none">Reranked ✓<span class="meta-dot" style="display:inline-block;margin-left:8px"></span></span>
+        <span class="meta-item"><strong id="meta-latency">—</strong> ms</span>
+      </div>
+
+      <!-- Sources -->
+      <div class="sources-section" id="sources-section" style="display:none">
+        <button class="sources-toggle" id="sources-toggle">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Sources &amp; Citations
+          <svg class="chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sources-grid" id="sources-grid"></div>
+      </div>
+
+    </div><!-- /answer-area -->
+  </div><!-- /main-card -->
+
+  <!-- ── Feature highlights ── -->
+  <div class="features">
+    <div class="feat">
+      <div class="feat-icon">🔍</div>
+      <div class="feat-title">HyDE Retrieval</div>
+      <div class="feat-desc">Hypothetical Document Embeddings improve recall for complex legal queries.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">⚖️</div>
+      <div class="feat-title">Cross-Encoder Reranking</div>
+      <div class="feat-desc">ms-marco-MiniLM rescores candidates for maximum relevance precision.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🌐</div>
+      <div class="feat-title">Bilingual Arabic/English</div>
+      <div class="feat-desc">Ask in either language; the pipeline detects and routes automatically.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">💬</div>
+      <div class="feat-title">Session Memory</div>
+      <div class="feat-desc">Conversation context is preserved across follow-up questions (30 min TTL).</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🧠</div>
+      <div class="feat-title">Qwen3 Thinking Mode</div>
+      <div class="feat-desc">Enable chain-of-thought reasoning for complex multi-part legal questions.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📚</div>
+      <div class="feat-title">8 Legal Domains</div>
+      <div class="feat-desc">Traffic law, licensing, registration, accidents, commercial vehicles, and more.</div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>
+      Egyptian Road &amp; Mobility Assistant ·
+      NLP Course Project ·
+      <a href="http://localhost:8000/docs" target="_blank">API Docs (Swagger)</a> ·
+      <a href="http://localhost:8000/redoc" target="_blank">ReDoc</a> ·
+      <a href="http://localhost:8000/health" target="_blank">Health</a>
+    </p>
+    <p style="margin-top:8px">
+      Powered by Qwen3:4b · FAISS-CPU · Sentence-Transformers · FastAPI
+    </p>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+const API = 'http://localhost:8000';
+let currentSessionId = null;
+let loadingTimers = [];
+
+// ── Health check ──────────────────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    document.getElementById('health-dot').className = 'health-dot healthy';
+    document.getElementById('health-label').textContent = 'Online';
+    if (d.index_size !== undefined) {
+      document.getElementById('stat-chunks').textContent = d.index_size.toLocaleString();
+    }
+  } catch {
+    document.getElementById('health-dot').className = 'health-dot unhealthy';
+    document.getElementById('health-label').textContent = 'Offline';
+  }
+}
+checkHealth();
+
+// ── Arabic detection ──────────────────────────────────────────────────────────
+function isArabic(text) {
+  return /[\u0600-\u06FF]/.test(text);
+}
+
+// ── Input RTL detection ───────────────────────────────────────────────────────
+const textarea = document.getElementById('question-input');
+textarea.addEventListener('input', () => {
+  if (isArabic(textarea.value)) {
+    textarea.classList.add('is-arabic');
+  } else {
+    textarea.classList.remove('is-arabic');
+  }
+});
+
+// ── Example chips ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.example-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const q = btn.dataset.q;
+    textarea.value = q;
+    if (isArabic(q)) {
+      textarea.classList.add('is-arabic');
+    } else {
+      textarea.classList.remove('is-arabic');
+    }
+    textarea.focus();
+  });
+});
+
+// ── Domain topics ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.topic-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.topic-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ── Sources toggle ────────────────────────────────────────────────────────────
+const sourcesToggle = document.getElementById('sources-toggle');
+const sourcesGrid   = document.getElementById('sources-grid');
+sourcesToggle.addEventListener('click', () => {
+  sourcesToggle.classList.toggle('open');
+  sourcesGrid.classList.toggle('open');
+});
+
+// ── Loading messages ──────────────────────────────────────────────────────────
+const loadingSteps = [
+  'Embedding your question…',
+  'Searching knowledge base…',
+  'Reranking candidates…',
+  'Generating answer…',
+];
+
+function startLoadingMessages() {
+  const el = document.getElementById('loading-text');
+  let i = 0;
+  el.textContent = loadingSteps[0];
+  const iv = setInterval(() => {
+    i = Math.min(i + 1, loadingSteps.length - 1);
+    el.textContent = loadingSteps[i];
+  }, 1800);
+  loadingTimers.push(iv);
+}
+
+function stopLoadingMessages() {
+  loadingTimers.forEach(clearInterval);
+  loadingTimers = [];
+}
+
+// ── State helpers ─────────────────────────────────────────────────────────────
+function setState(state) {
+  const loading = document.getElementById('loading-state');
+  const content = document.getElementById('answer-content');
+  const error   = document.getElementById('error-box');
+  const area    = document.getElementById('answer-area');
+  const meta    = document.getElementById('meta-bar');
+  const sources = document.getElementById('sources-section');
+
+  loading.classList.remove('visible');
+  content.classList.remove('visible');
+  error.classList.remove('visible');
+  stopLoadingMessages();
+
+  if (state === 'loading') {
+    loading.classList.add('visible');
+    area.classList.add('has-content');
+    meta.style.display = 'none';
+    sources.style.display = 'none';
+    startLoadingMessages();
+  } else if (state === 'error') {
+    error.classList.add('visible');
+    area.classList.add('has-content');
+    meta.style.display = 'none';
+    sources.style.display = 'none';
+  } else if (state === 'answer') {
+    content.classList.add('visible');
+    area.classList.add('has-content');
+  } else {
+    area.classList.remove('has-content');
+    meta.style.display = 'none';
+    sources.style.display = 'none';
+  }
+}
+
+// ── Ask ───────────────────────────────────────────────────────────────────────
+async function ask() {
+  const q = textarea.value.trim();
+  if (!q) { textarea.focus(); return; }
+
+  const btn = document.getElementById('ask-btn');
+  btn.disabled = true;
+  setState('loading');
+
+  const thinking  = document.getElementById('thinking-toggle').checked;
+  const reranker  = document.getElementById('reranker-toggle').checked;
+
+  const body = {
+    question:      q,
+    thinking_mode: thinking,
+    use_reranker:  reranker,
+  };
+  if (currentSessionId) body.session_id = currentSessionId;
+
+  try {
+    const r = await fetch(`${API}/ask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(120000),
+    });
+
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${r.status}`);
+    }
+
+    const d = await r.json();
+
+    // Session
+    currentSessionId = d.session_id;
+    const sessionEl = document.getElementById('session-tag');
+    sessionEl.textContent = `Session: ${d.session_id.slice(0, 8)}…`;
+
+    // Answer
+    const answerEl = document.getElementById('answer-text');
+    answerEl.textContent = d.answer;
+    if (isArabic(d.answer)) {
+      answerEl.classList.add('is-arabic');
+    } else {
+      answerEl.classList.remove('is-arabic');
+    }
+
+    // Metadata
+    document.getElementById('meta-model').textContent    = d.model_used || '—';
+    document.getElementById('meta-chunks').textContent   = d.chunks_used ?? '—';
+    document.getElementById('meta-latency').textContent  = d.latency_ms?.total ?? '—';
+    document.getElementById('meta-hyde-wrap').style.display    = d.hyde_used    ? '' : 'none';
+    document.getElementById('meta-reranker-wrap').style.display = d.reranker_used ? '' : 'none';
+    document.getElementById('meta-bar').style.display = 'flex';
+
+    // Sources
+    const sourcesGrid = document.getElementById('sources-grid');
+    sourcesGrid.innerHTML = '';
+    if (d.sources && d.sources.length > 0) {
+      d.sources.slice(0, 6).forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'source-card';
+        card.innerHTML = `
+          <a class="source-url" href="${s.url}" target="_blank" rel="noopener">${s.url}</a>
+          <div class="source-group">${s.group || s.source_name || ''} · ${s.language?.toUpperCase() || ''}</div>
+          <div class="source-preview">${s.text_preview || ''}</div>
+          <div class="source-score">Score: ${(s.score || 0).toFixed(3)}</div>
+        `;
+        sourcesGrid.appendChild(card);
+      });
+      document.getElementById('sources-section').style.display = '';
+      // Reset toggle
+      document.getElementById('sources-toggle').classList.remove('open');
+      sourcesGrid.classList.remove('open');
+    }
+
+    setState('answer');
+
+  } catch (err) {
+    document.getElementById('error-text').textContent =
+      err.message.includes('fetch') || err.message.includes('Failed')
+        ? 'Cannot reach API. Is the server running? (python run.py serve)'
+        : err.message;
+    setState('error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Event listeners ───────────────────────────────────────────────────────────
+document.getElementById('ask-btn').addEventListener('click', ask);
+
+textarea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    ask();
+  }
+});
+</script>
+</body>
+</html>
